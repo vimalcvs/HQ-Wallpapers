@@ -17,6 +17,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.webkit.URLUtil;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -44,8 +45,9 @@ public class LatestDetailActivity extends AppCompatActivity {
 
     private PhotoView pvWallpaper;
     private Wallpaper selectedObject;
-    private Button ibfavorite;
+    private ImageView ibfavorite, ibShare, ibDownload;
     private DbHelper dbHelper;
+    private Button btnSetWall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,14 +57,15 @@ public class LatestDetailActivity extends AppCompatActivity {
         ibfavorite = findViewById(R.id.ibfavorite);
         pvWallpaper = findViewById(R.id.pvWallpaper);
 
-        Button btnSetWall = findViewById(R.id.btnSetWall);
-        Button ibShare = findViewById(R.id.ibShare);
-        Button ibDownload = findViewById(R.id.ibDownload);
+        btnSetWall = findViewById(R.id.btnSetWallpaper);
+        ibShare = findViewById(R.id.ibShare);
+        ibDownload = findViewById(R.id.ibDownload);
 
         dbHelper = new DbHelper(LatestDetailActivity.this);
 
         selectedObject = (Wallpaper) getIntent().getSerializableExtra("wallpaper");
 
+        assert selectedObject != null;
         if (dbHelper.isFavoriteWallpaper(selectedObject)) {
             ibfavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_24);
         } else {
@@ -152,62 +155,68 @@ public class LatestDetailActivity extends AppCompatActivity {
         ibDownload.setOnClickListener(v -> Dexter.withContext(LatestDetailActivity.this)
                 .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .withListener(new PermissionListener() {
+
+
+
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-
                         Drawable drawable = pvWallpaper.getDrawable();
                         if (!(drawable instanceof BitmapDrawable)) {
+                            Toast.makeText(LatestDetailActivity.this, "Failed to retrieve the image", Toast.LENGTH_SHORT).show();
                             return;
                         }
+
                         BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
                         Bitmap bitmap = bitmapDrawable.getBitmap();
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            OutputStream os;
+                            // For Android Q and above
                             try {
-
                                 ContentResolver resolver = getContentResolver();
-                                ContentValues cv = new ContentValues();
-                                String fileName = URLUtil.guessFileName(selectedObject.getLargeImageURL(), null, null);
-                                cv.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName + ".jpg");
-                                cv.put(MediaStore.MediaColumns.MIME_TYPE, "image/*");
-                                cv.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + getString(R.string.app_name));
-                                Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
-                                os = resolver.openOutputStream(Objects.requireNonNull(imageUri));
-                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
-                                Objects.requireNonNull(os);
+                                ContentValues values = new ContentValues();
+                                String fileName = URLUtil.guessFileName(selectedObject.getLargeImageURL(), null, "image/jpeg");
+                                values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+                                values.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
+                                values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + getString(R.string.app_name));
 
-                                Toast.makeText(LatestDetailActivity.this, "Wallpaper saved successfully", Toast.LENGTH_SHORT).show();
+                                Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                                if (uri != null) {
+                                    OutputStream outputStream = resolver.openOutputStream(uri);
+                                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                                    Objects.requireNonNull(outputStream).close();
+                                    Toast.makeText(LatestDetailActivity.this, "Wallpaper saved successfully!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(LatestDetailActivity.this, "Failed to save wallpaper", Toast.LENGTH_SHORT).show();
+                                }
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                Toast.makeText(LatestDetailActivity.this, "Unable to save wallpaper\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LatestDetailActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         } else {
-
-                            File directory = new File(Environment.getExternalStorageDirectory(), getString(R.string.app_name));
-                            if (!directory.exists()) {
-                                directory.mkdir();
+                            // For Android versions below Q
+                            File directory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), getString(R.string.app_name));
+                            if (!directory.exists() && !directory.mkdirs()) {
+                                Toast.makeText(LatestDetailActivity.this, "Failed to create directory", Toast.LENGTH_SHORT).show();
+                                return;
                             }
-                            String fileName = URLUtil.guessFileName(selectedObject.getLargeImageURL(), null, null);
-                            File wallpaperFile = new File(directory, fileName);
+
+                            String fileName = URLUtil.guessFileName(selectedObject.getLargeImageURL(), null, "image/jpeg");
+                            File file = new File(directory, fileName);
 
                             try {
-                                FileOutputStream fos = new FileOutputStream(wallpaperFile);
+                                FileOutputStream fos = new FileOutputStream(file);
                                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                                fos.close();
 
-                                String[] paths = new String[]{wallpaperFile.getAbsolutePath()};
-                                String[] mimetype = new String[]{"image/*"};
-                                MediaScannerConnection.scanFile(LatestDetailActivity.this, paths, mimetype, (path, uri) -> {
-
-                                });
-                                Toast.makeText(LatestDetailActivity.this, "Wallpaper saved at: " + wallpaperFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
-
-                            } catch (FileNotFoundException e) {
+                                MediaScannerConnection.scanFile(LatestDetailActivity.this, new String[]{file.getAbsolutePath()}, new String[]{"image/jpeg"}, null);
+                                Toast.makeText(LatestDetailActivity.this, "Wallpaper saved at: " + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
+                            } catch (Exception e) {
                                 e.printStackTrace();
-                                Toast.makeText(LatestDetailActivity.this, "Unable to save wallpaper", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LatestDetailActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
+
 
                     @Override
                     public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
@@ -224,6 +233,7 @@ public class LatestDetailActivity extends AppCompatActivity {
                             builder.show();
                         }
                     }
+
                     @Override
                     public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
                         permissionToken.continuePermissionRequest();
