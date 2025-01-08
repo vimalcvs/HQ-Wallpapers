@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="background_color">#F5F5F5</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="button_color">#FF5722</color>
+
+    <color name="card_background_color">#F0F0F0</color> <!-- Light gray card background -->
+    <color name="icon_tint">#E91E63</color> <!-- Orange for the favorite icon -->
+    <color name="overlay_background">#80000000</color> <!-- Semi-transparent black for overlay -->
 </resources>

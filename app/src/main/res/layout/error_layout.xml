@@ -1,39 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:id="@+id/errorLayout"
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/errorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
+    android:padding="16dp"
+    android:background="@color/background_color"
     android:visibility="gone"
-    tools:visibility="visible"
-    xmlns:tools="http://schemas.android.com/tools">
+    tools:visibility="visible">
 
+    <!-- Error Image -->
     <ImageView
         android:id="@+id/ivError"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginBottom="16dp"
         android:adjustViewBounds="true"
-        android:src="@drawable/ic_baseline_cloud_off_24"/>
+        android:src="@drawable/ic_baseline_cloud_off_24"
+        android:contentDescription="Error icon"
+        android:elevation="4dp" />
+
+    <!-- Error Title -->
     <TextView
         android:id="@+id/tvWhoops"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Whooops"
+        android:text="Whoops!"
         android:textStyle="bold"
-        android:textColor="#212121"
-        android:textSize="22sp"/>
+        android:textColor="@color/primary_text"
+        android:textSize="24sp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Error Message -->
     <TextView
         android:id="@+id/tvError"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Unable to fetch data from Server, Please check your internet connection and try again later"
-        android:gravity="center"/>
-    <Button
+        android:text="Unable to fetch data from the server.\nPlease check your internet connection and try again later."
+        android:gravity="center"
+        android:textColor="@color/secondary_text"
+        android:textSize="16sp"
+        android:layout_marginBottom="24dp" />
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnRetry"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#FF0000"
-        android:text="Retry"/>
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:text="Retry"
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        android:fontFamily="sans-serif-medium"
+        android:elevation="6dp"
+        android:background="@drawable/rounded_button_background"
+        android:gravity="center" />
 
 </LinearLayout>

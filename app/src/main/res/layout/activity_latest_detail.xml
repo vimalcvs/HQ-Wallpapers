@@ -6,56 +6,99 @@
     android:layout_height="match_parent"
     tools:context=".LatestDetailActivity">
 
+    <!-- Loading Progress Bar -->
     <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
 
+    <!-- Wallpaper Viewer -->
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/pvWallpaper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:layout_above="@id/layoutbtn"/>
 
+        android:src="@drawable/demo"
+        android:scaleType="centerCrop" />
+
+    <!-- Bottom Actions Layout -->
     <LinearLayout
-        android:id="@+id/layoutbtn"
+        android:id="@+id/layoutActions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/transparent"
+        android:elevation="4dp"
         android:orientation="horizontal"
-        android:padding="1dp"
-        android:layout_alignParentBottom="true">
+        android:padding="8dp">
 
-
+        <!-- Set Wallpaper Button -->
         <Button
-            style="?attr/materialIconButtonFilledStyle"
-            android:id="@+id/btnSetWall"
+            android:id="@+id/btnSetWallpaper"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:text="@string/set_as_wallpaper"/>
+            android:backgroundTint="@color/button_color"
+            android:text="@string/set_as_wallpaper"
+            android:textColor="@color/white"
 
-        <Button
-            android:id="@+id/ibfavorite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="?attr/materialIconButtonFilledTonalStyle"
-            app:icon="@drawable/ic_baseline_favorite_border_24"/>
+            android:textSize="14sp" />
 
-        <Button
-            android:id="@+id/ibDownload"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="?attr/materialIconButtonFilledTonalStyle"
-            app:icon="@drawable/ic_baseline_arrow_downward_24" />
+        <!-- Favorite Button -->
+        <FrameLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
 
-        <Button
-            android:id="@+id/ibShare"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="?attr/materialIconButtonFilledTonalStyle"
-            app:icon="@drawable/ic_baseline_share_24"/>
+            android:elevation="4dp">
+
+            <ImageView
+                android:id="@+id/ibfavorite"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/favorite_icon"
+                android:src="@drawable/ic_baseline_favorite_border_24"
+                app:tint="@color/icon_tint" />
+        </FrameLayout>
+
+        <!-- Download Button -->
+        <FrameLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+
+            android:elevation="4dp">
+
+            <ImageView
+                android:id="@+id/ibDownload"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_arrow_downward_24"
+
+                app:tint="@color/icon_tint" />
+        </FrameLayout>
+
+        <!-- Share Button -->
+        <FrameLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+
+            android:elevation="4dp">
+
+            <ImageView
+                android:id="@+id/ibShare"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_share_24"
+
+                app:tint="@color/icon_tint" />
+        </FrameLayout>
 
     </LinearLayout>
-
 </RelativeLayout>

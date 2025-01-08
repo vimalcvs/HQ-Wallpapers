@@ -1,0 +1,17 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background with faded color -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#80000000" /> <!-- Semi-transparent black -->
+        </shape>
+    </item>
+    <!-- Foreground spinner -->
+    <item>
+        <rotate
+            android:fromDegrees="0"
+            android:toDegrees="360"
+            android:pivotX="50%"
+            android:pivotY="50%"
+            android:drawable="@android:drawable/progress_indeterminate_horizontal" />
+    </item>
+</layer-list>
